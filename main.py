@@ -8,17 +8,35 @@ def download_file(url, folder="downloads"):
         os.makedirs(folder, exist_ok=True)
 
         file_name = url.split("/")[-1] or "file"
-        local_path = os.path.join(folder, file_name)
+        file_types = {
+        "videos": (".mp4", ".mkv", ".avi", ".mov", ".flv", ".wmv"),
+        "images": (".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp"),
+        "documents": (".pdf", ".doc", ".docx", ".txt", ".ppt", ".pptx", ".xls", ".xlsx"),
+        "audio": (".mp3", ".wav", ".aac", ".flac", ".ogg"),
+        "compressed": (".zip", ".rar", ".7z", ".tar", ".gz"),
+        "code": (".py", ".java", ".cpp", ".c", ".js", ".html", ".css", ".json")
+                                             }
+        for folder_name, extensions in file_types.items():
+            if file_name.lower().endswith(extensions):
+                file_type = folder_name
+                break
+            else:
+                file_type = "others"
+                break
+        folder_path = os.path.join(folder, file_type)
+        os.makedirs(folder_path, exist_ok=True)
+                
+        file_path = os.path.join(folder_path, file_name)
         i=1
         name,ext = os.path.splitext(file_name)
-        while os.path.exists(local_path):
+        while os.path.exists(file_path):
             file_name=f"{name}({i}){ext}"
-            local_path=os.path.join(folder,file_name)
+            file_path=os.path.join(folder_path,file_name)
             i +=1
         response = requests.get(url)
         response.raise_for_status()
 
-        with open(local_path, "wb") as f:
+        with open(file_path, "wb") as f:
             f.write(response.content)
 
         print(f"✅ Downloaded: {file_name}")
